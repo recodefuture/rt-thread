@@ -15,8 +15,9 @@
 
 #include <string.h>
 #include "dev_spi_msd.h"
+#include "rtthread.h"
 
-//#define MSD_TRACE
+#define MSD_TRACE
 
 #ifdef MSD_TRACE
     #define MSD_DEBUG(...)         rt_kprintf("[MSD] %d ", rt_tick_get()); rt_kprintf(__VA_ARGS__);
@@ -759,11 +760,26 @@ static rt_err_t rt_msd_init(rt_device_t dev)
         {
             rt_spi_take(msd->spi_device);
 
-            result = _send_cmd(msd->spi_device, READ_OCR, 0x00, 0x00, response_r3, response);
+            int count = 0;
+            for (; count < 5; count++)
+            {
+                rt_thread_mdelay(200);
+                result = _send_cmd(msd->spi_device, READ_OCR, 0x00, 0x00, response_r3, response);
+                if (result != RT_EOK)
+                {
+                    MSD_DEBUG("[err] It maybe SD2.0 But it is Not response to CMD58!\r\n");
+                    continue;
+                }
+                else 
+                {
+                    MSD_DEBUG("[OK] \r\n");
+                    break;
+                }
+            }
             if (result != RT_EOK)
             {
                 rt_spi_release(msd->spi_device);
-                MSD_DEBUG("[err] It maybe SD2.0 But it is Not response to CMD58!\r\n");
+                MSD_DEBUG("[err] It maybe SD2.0 But it is Not response to CMD58!!!, count=%d\r\n", count);
                 goto _exit;
             }
 
@@ -905,52 +921,70 @@ static rt_err_t rt_msd_init(rt_device_t dev)
 #endif
     }
 
-    /* set CRC */
-    {
-        rt_spi_release(msd->spi_device);
-        rt_spi_take(msd->spi_device);
-#ifdef MSD_USE_CRC
-        result = _send_cmd(msd->spi_device, CRC_ON_OFF, 0x01, 0x83, response_r1, response);
-#else
-        result = _send_cmd(msd->spi_device, CRC_ON_OFF, 0x00, 0x91, response_r1, response);
-#endif
-        rt_spi_release(msd->spi_device);
-        if ((result != RT_EOK) || (response[0] != MSD_RESPONSE_NO_ERROR))
-        {
-            MSD_DEBUG("[err] CMD59 CRC_ON_OFF fail! response : 0x%02X\r\n", response[0]);
-            result = -RT_ERROR;
-            goto _exit;
-        }
-    } /* set CRC */
+//     /* set CRC */
+//     {
+//         rt_spi_release(msd->spi_device);
+//         rt_spi_take(msd->spi_device);
+// #ifdef MSD_USE_CRC
+//         result = _send_cmd(msd->spi_device, CRC_ON_OFF, 0x01, 0x83, response_r1, response);
+// #else
+//         result = _send_cmd(msd->spi_device, CRC_ON_OFF, 0x00, 0x91, response_r1, response);
+// #endif
+//         rt_spi_release(msd->spi_device);
+//         if ((result != RT_EOK) || (response[0] != MSD_RESPONSE_NO_ERROR))
+//         {
+//             MSD_DEBUG("[err] CMD59 CRC_ON_OFF fail! response : 0x%02X\r\n", response[0]);
+//             result = -RT_ERROR;
+//             goto _exit;
+//         }
+//     } /* set CRC */
 
     /* CMD16 SET_BLOCKLEN */
-    {
-        rt_spi_release(msd->spi_device);
-        rt_spi_take(msd->spi_device);
-        result = _send_cmd(msd->spi_device, SET_BLOCKLEN, SECTOR_SIZE, 0x00, response_r1, response);
-        rt_spi_release(msd->spi_device);
-        if ((result != RT_EOK) || (response[0] != MSD_RESPONSE_NO_ERROR))
-        {
-            MSD_DEBUG("[err] CMD16 SET_BLOCKLEN fail! response : 0x%02X\r\n", response[0]);
-            result = -RT_ERROR;
-            goto _exit;
-        }
-        msd->geometry.block_size = SECTOR_SIZE;
-        msd->geometry.bytes_per_sector = SECTOR_SIZE;
-    }
+    // {
+    //     rt_spi_release(msd->spi_device);
+    //     rt_spi_take(msd->spi_device);
+    //     result = _send_cmd(msd->spi_device, SET_BLOCKLEN, SECTOR_SIZE, 0x00, response_r1, response);
+    //     rt_spi_release(msd->spi_device);
+    //     if ((result != RT_EOK) || (response[0] != MSD_RESPONSE_NO_ERROR))
+    //     {
+    //         MSD_DEBUG("[err] CMD16 SET_BLOCKLEN fail! response : 0x%02X\r\n", response[0]);
+    //         result = -RT_ERROR;
+    //         goto _exit;
+    //     }
+    //     msd->geometry.block_size = SECTOR_SIZE;
+    //     msd->geometry.bytes_per_sector = SECTOR_SIZE;
+    // }
 
     /* read CSD */
     {
         uint8_t CSD_buffer[MSD_CSD_LEN];
 
+
         rt_spi_take(msd->spi_device);
-//        result = _send_cmd(msd->spi_device, SEND_CSD, 0x00, 0xAF, response_r1, response);
-        result = _send_cmd(msd->spi_device, SEND_CSD, 0x00, 0x00, response_r1, response);
+
+        
+        int count = 0;
+        for (; count < 5; count++)
+        {
+            rt_thread_mdelay(200);
+    //        result = _send_cmd(msd->spi_device, SEND_CSD, 0x00, 0xAF, response_r1, response);
+            result = _send_cmd(msd->spi_device, SEND_CSD, 0x00, 0x00, response_r1, response);
+            if (result == RT_EOK)
+            {
+                MSD_DEBUG("OK\r\n");
+                break;
+            }
+            else
+            {
+                MSD_DEBUG("[err] CMD9 SEND_CSD timeout!\r\n");
+                continue;
+            }
+        }
 
         if (result != RT_EOK)
         {
             rt_spi_release(msd->spi_device);
-            MSD_DEBUG("[err] CMD9 SEND_CSD timeout!\r\n");
+            MSD_DEBUG("[err] CMD9 SEND_CSD timeout!!!\r\n");
             goto _exit;
         }
 
@@ -1168,8 +1202,12 @@ static rt_err_t rt_msd_init(rt_device_t dev)
                     /* memory capacity = (C_SIZE+1) * 512K byte */
                     card_capacity = (C_SIZE + 1) / 2; /* unit : Mbyte */
                     msd->geometry.sector_count = (C_SIZE + 1) * 1024; /* 512KB = 1024sector */
+                    msd->geometry.block_size = 64 * 1024;
+                    msd->geometry.bytes_per_sector = 512;
+
+                    
                     MSD_DEBUG("[info] card capacity : %d.%d Gbyte\r\n", card_capacity / 1024, (card_capacity % 1024) * 100 / 1024);
-                    MSD_DEBUG("[info] sector_count : %d\r\n", msd->geometry.sector_count);
+                    MSD_DEBUG("[info] sector_count : %lld\r\n", msd->geometry.sector_count);
                 }
                 else
                 {
