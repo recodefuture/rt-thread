@@ -1,0 +1,23 @@
+config RT_USING_RTC_PCF8563
+    bool "Enable PCF8563 external RTC chip driver"
+    default n
+    depends on RT_USING_RTC && RT_USING_I2C
+
+if RT_USING_RTC_PCF8563
+    config RT_RTC_PCF8563_I2C_BUS_NAME
+        string "PCF8563 I2C bus name"
+        default "i2c0"
+
+    config RT_RTC_PCF8563_I2C_ADDR
+        hex "PCF8563 I2C address (7-bit)"
+        range 0x00 0x7F
+        default 0x51
+
+    config RT_RTC_PCF8563_I2C_BUS_SPEED
+        int "PCF8563 I2C bus speed"
+        default 100000
+
+    config RT_RTC_PCF8563_DEV_NAME
+        string "PCF8563 RTC device name"
+        default "rtc"
+endif

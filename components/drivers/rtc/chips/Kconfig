@@ -1,0 +1,5 @@
+menu "RTC Chip Drivers"
+
+rsource "pcf8563/Kconfig"
+
+endmenu

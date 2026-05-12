@@ -1,4 +1,5 @@
 from building import *
+import os
 
 cwd = GetCurrentDir()
 src = []
@@ -13,6 +14,9 @@ if GetDepend(['RT_USING_RTC']):
     if GetDepend(['RT_USING_SOFT_RTC']):
         src = src + ['dev_soft_rtc.c']
 
-group = DefineGroup('DeviceDrivers', src, depend = ['RT_USING_RTC'], CPPPATH = CPPPATH)
+    if os.path.isfile(os.path.join(cwd, 'chips', 'SConscript')):
+        group = group + SConscript(os.path.join('chips', 'SConscript'))
+
+group = group + DefineGroup('DeviceDrivers', src, depend = ['RT_USING_RTC'], CPPPATH = CPPPATH)
 
 Return('group')

@@ -29,4 +29,6 @@ config RT_USING_RTC
         config RT_USING_SOFT_RTC
             bool "Using software simulation RTC device"
             default n
+
+        rsource "chips/Kconfig"
     endif

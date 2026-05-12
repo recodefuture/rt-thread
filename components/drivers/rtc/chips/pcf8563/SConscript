@@ -1,0 +1,7 @@
+from building import *
+
+src = ['pcf8563.c']
+
+group = DefineGroup('DeviceDrivers', src, depend = ['RT_USING_RTC_PCF8563'])
+
+Return('group')
