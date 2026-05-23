@@ -309,7 +309,7 @@ int rt_hw_nadc24d_init(void)
     }
 
     cfg.data_width = 8;
-    cfg.mode = RT_SPI_MASTER | RT_SPI_MODE_1 | RT_SPI_MSB;
+    cfg.mode = RT_SPI_MASTER | RT_SPI_MODE_0 | RT_SPI_MSB;
     cfg.max_hz = RT_NADC24D_SPI_MAX_HZ;
 
     if (rt_spi_configure(g_nadc24d.spi, &cfg) != RT_EOK)
