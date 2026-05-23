@@ -1,7 +1,9 @@
 config RT_USING_ADC
     bool "Using ADC device drivers"
     default n
-
+    if RT_USING_ADC
+        rsource "chips/Kconfig"
+    endif
 config RT_USING_DAC
     bool "Using DAC device drivers"
     default n
@@ -35,3 +37,5 @@ if RT_USING_INPUT_CAPTURE
         int "Set input capture ringbuffer size"
         default 100
 endif
+
+

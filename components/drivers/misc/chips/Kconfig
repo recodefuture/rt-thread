@@ -1,0 +1,30 @@
+menu "ADC Chip Drivers"
+
+config RT_USING_NADC24D
+    bool "Enable NADC24D external ADC"
+    default n
+    depends on RT_USING_ADC && RT_USING_SPI
+
+if RT_USING_NADC24D
+    config RT_NADC24D_SPI_DEV_NAME
+        string "NADC24D SPI device name"
+        default "spi2"
+
+    config RT_NADC24D_SPI_MAX_HZ
+        int "NADC24D SPI max frequency (Hz)"
+        default 1000000
+
+    config RT_NADC24D_DRDY_PIN
+        int "NADC24D DRDY pin (0 to disable)"
+        default 0
+
+    config RT_NADC24D_DRDY_TIMEOUT_MS
+        int "NADC24D DRDY timeout (ms)"
+        default 200
+
+    config RT_NADC24D_VREF_MV
+        int "NADC24D reference voltage (mV)"
+        default 2400
+endif
+
+endmenu

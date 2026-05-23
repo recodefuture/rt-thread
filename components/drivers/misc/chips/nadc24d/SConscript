@@ -1,0 +1,7 @@
+from building import *
+
+src = ['nadc24d.c']
+
+group = DefineGroup('DeviceDrivers', src, depend = ['RT_USING_NADC24D'])
+
+Return('group')

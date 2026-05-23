@@ -296,7 +296,7 @@ static void pcf8563_time_test(int argc, char *argv[])
     if (argc == 2)
     {
         int ms = atoi(argv[1]);
-        if (ms > 0)
+        if (ms > 500)
         {
             delay = rt_tick_from_millisecond((rt_int32_t)ms);
         }
@@ -306,7 +306,7 @@ static void pcf8563_time_test(int argc, char *argv[])
         int ms = atoi(argv[1]);
         int times = atoi(argv[2]);
 
-        if (ms > 0)
+        if (ms > 500)
         {
             delay = rt_tick_from_millisecond((rt_int32_t)ms);
         }
