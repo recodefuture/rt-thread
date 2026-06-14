@@ -1,0 +1,9 @@
+from building import *
+import os
+
+group = []
+
+if os.path.isfile(os.path.join(GetCurrentDir(), 'cy62157e_45zs', 'SConscript')):
+    group = group + SConscript(os.path.join('cy62157e_45zs', 'SConscript'))
+
+Return('group')

@@ -1,0 +1,14 @@
+from building import *
+import os
+
+cwd = GetCurrentDir()
+src = []
+CPPPATH = [cwd]
+
+if GetDepend(['RT_USING_CY62157']):
+    src = src + ['cy62157e_45zs.c']
+
+if len(src):
+    group = DefineGroup('CY62157E45ZS', src, depend = ['RT_USING_CY62157'], CPPPATH = CPPPATH)
+
+Return('group')

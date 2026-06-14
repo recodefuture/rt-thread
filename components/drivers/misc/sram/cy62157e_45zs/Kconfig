@@ -1,0 +1,26 @@
+config RT_USING_CY62157
+    bool "Using CY62157E-45ZS SRAM"
+    default n
+    depends on RT_USING_SRAM
+    help
+        Enable the CY62157E-45ZS SRAM driver skeleton.
+
+if RT_USING_CY62157
+
+config RT_CY62157_USE_CUSTOM_TIMING
+    bool "Use custom EBI timing values"
+    default y
+
+config RT_CY62157_MCLKDIV
+    int "EBI MCLK divider"
+    default 1
+
+config RT_CY62157_TCTL
+    hex "EBI timing control value"
+    default 0x03003318
+
+config RT_CY62157_TEST_STRIDE
+    int "Memory test stride"
+    default 0x40
+
+endif

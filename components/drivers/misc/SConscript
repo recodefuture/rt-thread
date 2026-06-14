@@ -33,6 +33,9 @@ if GetDepend(['RT_USING_RANDOM']):
 if len(src):
     group = DefineGroup('DeviceDrivers', src, depend = [''], CPPPATH = CPPPATH)
 
+if GetDepend(['RT_USING_SRAM']):
+    group = group + SConscript(os.path.join('sram', 'SConscript'))
+
 if os.path.isfile(os.path.join(cwd, 'chips', 'SConscript')):
     group = group + SConscript(os.path.join('chips', 'SConscript'))
 

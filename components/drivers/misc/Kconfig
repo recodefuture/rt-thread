@@ -24,9 +24,13 @@ config RT_USING_PWM
     bool "Using PWM device drivers"
     default n
 
-config RT_USING_PULSE_ENCODER
-    bool "Using PULSE ENCODER device drivers"
+menuconfig RT_USING_SRAM
+    bool "Using SRAM device drivers"
     default n
+
+if RT_USING_SRAM
+    rsource "sram/Kconfig"
+endif
 
 config RT_USING_INPUT_CAPTURE
     bool "Using INPUT CAPTURE device drivers"

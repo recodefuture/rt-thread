@@ -260,7 +260,7 @@ static rt_err_t nadc24d_chip_reset(void)
 {
     rt_uint8_t id = 0;
 
-    rt_thread_mdelay(5);
+    rt_thread_mdelay(1);
 
     if (nadc24d_write_reg(REG_ADDR_PWD_CTRL2, 0x00) != RT_EOK)
     {
@@ -357,6 +357,25 @@ static void nadc24d_read(int argc, char *argv[])
     if (adc == RT_NULL)
     {
         rt_kprintf("nadc24d: device not found\n");
+        return;
+    }
+
+    if (argc == 1)
+    {
+        rt_int8_t ch;
+
+        for (ch = 0; ch <= 1; ch++)
+        {
+            rt_uint32_t i;
+
+            for (i = 0; i < 3; i++)
+            {
+                rt_uint32_t value = rt_adc_read(adc, ch);
+                rt_kprintf("nadc24d ch%d: %d\n", ch, (rt_int32_t)value);
+                rt_thread_mdelay(delay);
+            }
+        }
+
         return;
     }
 
